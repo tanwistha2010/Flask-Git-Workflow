@@ -16,6 +16,12 @@ client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
 db = client["FlaskDatabase"]
 collection = db["students"]
 
+
+# To-Do items collection
+todo_collection = db["todo_items"]
+
+
+
 # Test connection
 try:
     client.admin.command('ping')
@@ -83,6 +89,39 @@ def submit():
             email=request.form.get('email', ''),
             course=request.form.get('course', '')
         )
+
+
+# TASK 3: Submit To-Do Item
+@app.route('/submittodoitem', methods=['POST'])
+def submittodoitem():
+
+    try:
+        item_name = request.form.get('itemName', '').strip()
+        item_description = request.form.get('itemDescription', '').strip()
+
+        if not item_name or not item_description:
+            return "Item Name and Item Description are required!", 400
+
+        todo_item = {
+            "itemName": item_name,
+            "itemDescription": item_description
+        }
+
+        todo_collection.insert_one(todo_item)
+
+        return "To-Do item saved successfully!"
+
+    except Exception as e:
+        return f"Error saving To-Do item: {str(e)}", 500
+
+
+
+
+
+
+
+
+
 
 
 # Success page
